@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <import type="android.view.View" />
+        <variable
+            name="item"
+            type="com.example.commerce_test.data.models.Document" />
+    </data>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <ImageView android:id="@+id/iv_photo"
+            android:layout_width="100dp"
+            android:layout_height="150dp"
+            itemImgUrl="@{item.image_url}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:textColor="@color/black"
+            android:textSize="14dp"
+            android:text="@{item.collection}"
+            app:layout_constraintTop_toBottomOf="@+id/iv_photo"
+            app:layout_constraintStart_toStartOf="@+id/iv_photo"
+            app:layout_constraintEnd_toEndOf="@+id/iv_photo"/>
+
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>
