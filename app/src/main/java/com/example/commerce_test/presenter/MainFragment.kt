@@ -23,7 +23,9 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class MainFragment : Fragment() {
 
-    private lateinit var binding: FragmentMainBinding
+    private var _binding: FragmentMainBinding? = null
+    private val binding get() = _binding!!
+
     private val mainViewModel: MainViewModel by activityViewModels()
     private val mainAdapter: MainAdapter by lazy {
         MainAdapter()
@@ -36,14 +38,15 @@ class MainFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = DataBindingUtil.inflate(
+        _binding = DataBindingUtil.inflate<FragmentMainBinding?>(
             inflater,
             R.layout.fragment_main,
             container,
             false
-        )
-        binding.viewModel = mainViewModel
-        binding.lifecycleOwner = this@MainFragment
+        ).apply {
+            viewModel = mainViewModel
+            lifecycleOwner = this@MainFragment
+        }
         return binding.root
     }
 
@@ -55,7 +58,7 @@ class MainFragment : Fragment() {
         }
         binding.rvFilter.apply {
             adapter = filterAdapter
-            layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+            layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         }
         viewLifecycleOwner.lifecycleScope.launch {
             mainViewModel.uiState.flowWithLifecycle(viewLifecycleOwner.lifecycle)
@@ -64,7 +67,7 @@ class MainFragment : Fragment() {
                     if (state.isLoading) {
                         Toast.makeText(
                             requireContext(),
-                            "데이터를 조회 중 입니다.",
+                            R.string.loading_msg,
                             Toast.LENGTH_SHORT
                         ).show()
                     }
@@ -91,5 +94,10 @@ class MainFragment : Fragment() {
 
     private fun showToast(msg: String) {
         Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

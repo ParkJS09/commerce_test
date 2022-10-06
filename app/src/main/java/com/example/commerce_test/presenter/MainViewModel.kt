@@ -32,7 +32,7 @@ class MainViewModel @Inject constructor(
                     isLoading = true
                 )
             }
-            getImageUseCase(query).catch { result ->
+            getImageUseCase(query).catch {
                 showError()
             }.collect { result ->
                 when (result) {

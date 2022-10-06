@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.commerce_test.R
 import com.example.commerce_test.data.models.Document
 import com.example.commerce_test.databinding.ItemImageBinding
+import com.example.commerce_test.presenter.adapter.viewholder.ImageViewHolder
 
 class MainAdapter : ListAdapter<Document, RecyclerView.ViewHolder>(SummonerMatchDiffCallback()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -26,16 +27,6 @@ class MainAdapter : ListAdapter<Document, RecyclerView.ViewHolder>(SummonerMatch
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         (holder as ImageViewHolder).bind(getItem(position) as Document)
-    }
-
-
-    inner class ImageViewHolder(
-        private val context: Context,
-        private val binding: ItemImageBinding,
-    ) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(document: Document) {
-            binding.item = document
-        }
     }
 }
 

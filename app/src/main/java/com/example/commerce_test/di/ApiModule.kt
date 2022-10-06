@@ -1,5 +1,6 @@
 package com.example.commerce_test.di
 
+import com.example.commerce_test.BuildConfig
 import com.example.commerce_test.data.repository.ImageRepository
 import com.example.commerce_test.data.repository.impl.ImageRepositoryImpl
 import com.example.commerce_test.data.service.NetworkService
@@ -48,7 +49,7 @@ abstract class ApiModule {
             @Throws(IOException::class)
             override fun intercept(chain: Interceptor.Chain) : Response = with(chain) {
                 val newRequest = request().newBuilder()
-                    .addHeader("Authorization", Constants.API_KEY)
+                    .addHeader("Authorization", BuildConfig.KAKAO_API_KEY)
                     .build()
                 proceed(newRequest)
             }
