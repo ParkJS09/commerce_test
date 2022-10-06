@@ -11,8 +11,8 @@ fun ImageView.setItemImage(
     itemImgUrl: String?,
 ) {
     itemImgUrl?.let { url ->
-        Glide.with(context).clear(this)
-        Glide.with(this).load(url).let { request ->
+        Glide.with(this)
+            .load(url).let { request ->
             request.placeholder(
                 resources.getDrawable(
                     com.google.android.material.R.drawable.mtrl_ic_error,

@@ -5,24 +5,19 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Filter
-import android.widget.GridLayout
 import android.widget.Toast
-import androidx.compose.ui.platform.ComposeView
+import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.commerce_test.R
 import com.example.commerce_test.databinding.FragmentMainBinding
 import com.example.commerce_test.presenter.adapter.FilterAdapter
 import com.example.commerce_test.presenter.adapter.MainAdapter
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -31,7 +26,7 @@ class MainFragment : Fragment() {
     private lateinit var binding: FragmentMainBinding
     private val mainViewModel: MainViewModel by activityViewModels()
     private val mainAdapter: MainAdapter by lazy {
-        MainAdapter(mainViewModel)
+        MainAdapter()
     }
     private val filterAdapter: FilterAdapter by lazy {
         FilterAdapter(mainViewModel)
@@ -65,30 +60,36 @@ class MainFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             mainViewModel.uiState.flowWithLifecycle(viewLifecycleOwner.lifecycle)
                 .collect { state ->
-                    when (state) {
-                        is MainUiState.Empty -> {
-                            if (state.isLoading) {
-                                Toast.makeText(
-                                    requireContext(),
-                                    "데이터를 조회 중 입니다.",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
-                        }
-                        is MainUiState.Image -> {
-                            mainAdapter.submitList(state.imageList)
-                            filterAdapter.submitList(state.collectionList)
-                        }
+
+                    if (state.isLoading) {
+                        Toast.makeText(
+                            requireContext(),
+                            "데이터를 조회 중 입니다.",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
 
                     if (state.noticeMsg.isNotEmpty()) {
-                        Toast.makeText(requireContext(), state.noticeMsg, Toast.LENGTH_SHORT).show()
+                        showToast(state.noticeMsg)
+                    }
+
+                    when (state) {
+                        is MainUiState.Empty -> {
+                            binding.tvEmptyMsg.visibility = View.VISIBLE
+                        }
+                        is MainUiState.Image -> {
+                            if (binding.tvEmptyMsg.isVisible) {
+                                binding.tvEmptyMsg.visibility = View.GONE
+                            }
+                            mainAdapter.submitList(state.imageList)
+                            filterAdapter.submitList(state.collectionList)
+                        }
                     }
                 }
         }
     }
 
-    companion object {
-        private val TAG = MainFragment::class.java.simpleName
+    private fun showToast(msg: String) {
+        Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
     }
 }

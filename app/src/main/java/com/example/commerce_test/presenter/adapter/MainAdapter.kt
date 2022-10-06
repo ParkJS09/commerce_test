@@ -10,11 +10,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.commerce_test.R
 import com.example.commerce_test.data.models.Document
 import com.example.commerce_test.databinding.ItemImageBinding
-import com.example.commerce_test.presenter.MainViewModel
 
-class MainAdapter(
-    private val mainViewModel: MainViewModel
-) : ListAdapter<Document, RecyclerView.ViewHolder>(SummonerMatchDiffCallback()) {
+class MainAdapter : ListAdapter<Document, RecyclerView.ViewHolder>(SummonerMatchDiffCallback()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return ImageViewHolder(
             parent.context,

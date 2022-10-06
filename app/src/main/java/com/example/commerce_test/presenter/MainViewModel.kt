@@ -1,6 +1,5 @@
 package com.example.commerce_test.presenter
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.commerce_test.data.models.Document
@@ -28,37 +27,65 @@ class MainViewModel @Inject constructor(
 
     fun getImage(query: String) {
         viewModelScope.launch {
-            getImageUseCase(query).catch {
-                Log.d("PJS", "ERROR")
+            _viewModelState.update { state ->
+                state.copy(
+                    isLoading = true
+                )
+            }
+            getImageUseCase(query).catch { result ->
+                showError()
             }.collect { result ->
-                if (result is NetworkResult.Success) {
-                    Log.d("PJS", result.response.documents.toString())
-                    result.response.documents.forEach { document ->
-                        _viewModelState.update { state ->
-                            state.copy(
-                                oriList = state.oriList + document,
-                                imageList = (state.oriList + document).filter { item ->
-                                    if (state.currentCollection == "ALL") {
-                                        item.collection != "ALL"
+                when (result) {
+                    is NetworkResult.Success -> {
+                        if(result.response.isEmpty()){
+                            _viewModelState.update { state ->
+                                state.copy(
+                                    isLoading = false,
+                                    isError = false,
+                                    noticeMsg = "${query}에 대한 결과가 없습니다."
+                                )
+                            }
+                            return@collect
+                        }
+                        result.response.map { document ->
+                            _viewModelState.update { state ->
+                                state.copy(
+                                    isLoading = false,
+                                    oriList = state.oriList + document,
+                                    imageList = (state.oriList + document).filter { item ->
+                                        if (state.currentCollection == "ALL") {
+                                            item.collection != "ALL"
+                                        } else {
+                                            item.collection == state.currentCollection
+                                        }
+                                    },
+                                    collectionList = if (!_viewModelState.value.collectionList.contains(
+                                            document.collection
+                                        )
+                                    ) {
+                                        state.collectionList + document.collection
                                     } else {
-                                        item.collection == state.currentCollection
+                                        state.collectionList
                                     }
-                                },
-                                collectionList = if (!_viewModelState.value.collectionList.contains(
-                                        document.collection
-                                    )
-                                ) {
-                                    state.collectionList + document.collection
-                                } else {
-                                    state.collectionList
-                                }
-                            )
+                                )
+                            }
                         }
                     }
-                } else {
-                    Log.d("PJS", "NETWORK_ERROR")
+                    is NetworkResult.Fail -> {
+                        showError()
+                    }
                 }
             }
+        }
+    }
+
+    private fun showError() {
+        _viewModelState.update { state ->
+            state.copy(
+                isLoading = false,
+                isError = false,
+                noticeMsg = "데이터 조회 중 에러가 발생하였습니다."
+            )
         }
     }
 
@@ -66,7 +93,7 @@ class MainViewModel @Inject constructor(
         _viewModelState.update { state ->
             state.copy(
                 imageList = state.oriList.filter { item ->
-                    if(collection == "ALL"){
+                    if (collection == "ALL") {
                         item.collection != collection
                     } else {
                         item.collection == collection
@@ -77,7 +104,6 @@ class MainViewModel @Inject constructor(
         }
     }
 }
-
 
 sealed interface MainUiState {
     val isLoading: Boolean
@@ -104,7 +130,6 @@ sealed interface MainUiState {
 data class MainViewModelState(
     val isLoading: Boolean = false,
     val isError: Boolean = false,
-    val isMoreLoading: Boolean = false,
     val noticeMsg: String = "",
     val collectionList: List<String> = listOf("ALL"),
     val currentCollection: String = "ALL",
