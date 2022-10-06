@@ -1,6 +1,7 @@
 package com.example.commerce_test.presenter
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -63,7 +64,6 @@ class MainFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             mainViewModel.uiState.flowWithLifecycle(viewLifecycleOwner.lifecycle)
                 .collect { state ->
-
                     if (state.isLoading) {
                         Toast.makeText(
                             requireContext(),

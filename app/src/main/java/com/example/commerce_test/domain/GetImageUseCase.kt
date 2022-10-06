@@ -17,7 +17,7 @@ class GetImageUseCase @Inject constructor(
             if(result.documents.isNotEmpty()){
                 NetworkResult.Success(result.documents)
             } else {
-                NetworkResult.Fail("NETWORK_ERROR")
+                NetworkResult.Empty
             }
         }.flowOn(ioDispatcher)
 }

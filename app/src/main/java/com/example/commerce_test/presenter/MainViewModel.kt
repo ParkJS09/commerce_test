@@ -1,5 +1,6 @@
 package com.example.commerce_test.presenter
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.commerce_test.data.models.Document
@@ -26,10 +27,12 @@ class MainViewModel @Inject constructor(
 
 
     fun getImage(query: String) {
+        Log.d("PJS","query: $query")
         viewModelScope.launch {
             _viewModelState.update { state ->
                 state.copy(
-                    isLoading = true
+                    isLoading = true,
+                    noticeMsg = ""
                 )
             }
             getImageUseCase(query).catch {
@@ -37,16 +40,6 @@ class MainViewModel @Inject constructor(
             }.collect { result ->
                 when (result) {
                     is NetworkResult.Success -> {
-                        if(result.response.isEmpty()){
-                            _viewModelState.update { state ->
-                                state.copy(
-                                    isLoading = false,
-                                    isError = false,
-                                    noticeMsg = "${query}에 대한 결과가 없습니다."
-                                )
-                            }
-                            return@collect
-                        }
                         result.response.map { document ->
                             _viewModelState.update { state ->
                                 state.copy(
@@ -71,11 +64,21 @@ class MainViewModel @Inject constructor(
                             }
                         }
                     }
-                    is NetworkResult.Fail -> {
-                        showError()
+                    is NetworkResult.Empty -> {
+                        showEmpty(query)
                     }
                 }
             }
+        }
+    }
+
+    private fun showEmpty(query: String){
+        _viewModelState.update { state ->
+            state.copy(
+                isLoading = false,
+                isError = false,
+                noticeMsg = "${query}에 대한 결과가 없습니다."
+            )
         }
     }
 

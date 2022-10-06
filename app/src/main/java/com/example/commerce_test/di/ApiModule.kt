@@ -4,7 +4,6 @@ import com.example.commerce_test.BuildConfig
 import com.example.commerce_test.data.repository.ImageRepository
 import com.example.commerce_test.data.repository.impl.ImageRepositoryImpl
 import com.example.commerce_test.data.service.NetworkService
-import com.example.commerce_test.util.Constants
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
